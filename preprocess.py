@@ -2,6 +2,7 @@ import pandas as pd
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
 import numpy as np
+# list of all files the user can choose from
 potential_files = [
     "1INCH.csv",
     "AAVE.csv",
@@ -101,9 +102,6 @@ potential_files = [
     "ZEN.csv",
     "ZRX.csv",
 ]
-def time_stamp_to_days(array,time_stamp_index):
-    for i in range(array.shape[0]):
-        array[i][time_stamp_index] = i
 def sma(array, window):
     close = array[:, 3]                     
     kernel = np.ones(window) / window
@@ -126,22 +124,23 @@ def death_cross(array):
     return crossed.astype(int)
 def generate_y(array, horizon):
     close = array[:,4]
-    return close[horizon:]
+    return close[horizon:] # horizon is how many days in advance we are predicting
+#golden and death cross are finance concepts that can predict if sales will increase or decrease.
 class preprocess:
     def __init__(self,files,horizon):
             self.horizon = horizon
             self.files = files   
-    def generate_data(self):
+    def generate_data(self): #constructor for generate data. Both values will be populated from user input.
         files = self.files
         horizon = self.horizon
-        pre_processed_datasets = []
+        pre_processed_datasets = [] #list containing all x,y tuples
         print("processing files")
         for file_path in files:
             print(f"Loading {file_path}...")
             df= kagglehub.dataset_load(
                 KaggleDatasetAdapter.PANDAS,
                 "svaningelgem/crypto-currencies-daily-prices",
-                file_path,
+                file_path, #built in kaggle function creates a pandas data frame fromm kaggle data
             )
             array = df.to_numpy()
             array = array[1:, 2:]
@@ -149,13 +148,13 @@ class preprocess:
             sma_vals = sma(array, window).reshape(-1, 1)
             array = array[window-1:, :]     
             array = np.hstack([array, sma_vals])
-            prefix = np.arange(len(array)).reshape(-1, 1)
-            array = np.hstack([prefix, array])
-            golden_cross_values = golden_cross(array).reshape(-1,1)
-            death_cross_values = death_cross(array).reshape(-1,1)
+            prefix = np.arange(len(array)).reshape(-1, 1) #creates an array that counts by by an integer each time. This is the number of since since start of data set
+            array = np.hstack([prefix, array]) #number of days since start of dataset replaces the time stamp
+            golden_cross_values = golden_cross(array).reshape(-1,1) #golden cross was a 2d array, needs to be 1d
+            death_cross_values = death_cross(array).reshape(-1,1) #death cross was a 2d array, needs to be 1d
             array = array[200:] #shift values from cross
-            array = np.hstack([array,golden_cross_values])
-            array = np.hstack([array,death_cross_values])
+            array = np.hstack([array,golden_cross_values]) #adding golden cross values column
+            array = np.hstack([array,death_cross_values]) #adding death cross values column
             prefix = np.arange(len(array)).reshape(-1, 1)
             array = np.hstack([prefix, array])
             X = array[:-horizon]
@@ -163,7 +162,7 @@ class preprocess:
             X_y_tuple = (X,y)
             pre_processed_datasets.append(X_y_tuple)
         print("The columns are: (number of days since start,open,high,low,close,sma(10 days),golden cross, death cross)")
-        return pre_processed_datasets
+        return pre_processed_datasets # The result is a list of pre-processed X,y values for every dataset created by the user.
 processor = preprocess(potential_files,7)
 print(processor.generate_data())
 
