@@ -101,6 +101,9 @@ potential_files = [
     "ZEN.csv",
     "ZRX.csv",
 ]
+
+# print(len(potential_files))
+
 def time_stamp_to_days(array,time_stamp_index):
     for i in range(array.shape[0]):
         array[i][time_stamp_index] = i
@@ -126,7 +129,11 @@ def death_cross(array):
     return crossed.astype(int)
 def generate_y(array, horizon):
     close = array[:,4]
+    close_shape = close.shape
+    close_horizon = close[horizon:]
+    close_horizon_shape = close_horizon.shape
     return close[horizon:]
+    # return close
 class preprocess:
     def __init__(self,files,horizon):
             self.horizon = horizon
@@ -134,15 +141,30 @@ class preprocess:
     def generate_data(self):
         files = self.files
         horizon = self.horizon
-        pre_processed_datasets = []
+##### OLD START ###############################################################################################
+        # pre_processed_datasets = []
+##### OLD END ###############################################################################################
+##### NEW START ###############################################################################################
+        pre_processed_datasets = {}
+##### NEW END ###############################################################################################
         print("processing files")
-        for file_path in files:
+##### OLD START ###############################################################################################
+        # for file_path in files:
+##### OLD END ###############################################################################################
+        for index, file_path in enumerate(files):
+##### NEW START ###############################################################################################
             print(f"Loading {file_path}...")
-            df= kagglehub.dataset_load(
-                KaggleDatasetAdapter.PANDAS,
-                "svaningelgem/crypto-currencies-daily-prices",
-                file_path,
-            )
+            
+            try:
+                df= kagglehub.dataset_load(
+                    KaggleDatasetAdapter.PANDAS,
+                    "svaningelgem/crypto-currencies-daily-prices",
+                    file_path,
+                )
+                print('its working')
+            except Exception as e:
+                print(f'failed to load {file_path} : {e}')
+            
             array = df.to_numpy()
             array = array[1:, 2:]
             window = 10
@@ -158,14 +180,30 @@ class preprocess:
             array = np.hstack([array,death_cross_values])
             prefix = np.arange(len(array)).reshape(-1, 1)
             array = np.hstack([prefix, array])
-            X = array[:-horizon]
-            y = generate_y(X,horizon)
-            X_y_tuple = (X,y)
-            pre_processed_datasets.append(X_y_tuple)
-        print("The columns are: (number of days since start,open,high,low,close,sma(10 days),golden cross, death cross)")
+            
+            X = array[:, :-horizon]
+            X_shape = X.shape
+            y = generate_y(array,horizon)
+            y_shape = y.shape
+##### OLD START ###############################################################################################
+            # X_y_tuple = (X,y)
+            # pre_processed_datasets.append(X_y_tuple)
+##### OLD END ###############################################################################################
+##### NEW START ###############################################################################################
+            ## using nested dictionaries so that we have O(1) average case time for look ups
+            xy_data_for_file_path = {'X' : X, 'y' : y}
+            pre_processed_datasets[file_path] = xy_data_for_file_path
+            
+##### NEW START ###############################################################################################
+        print("The features are:\nnumber of days since start | open | high | low | close | sma(10 days) | golden cross | death cross")
         return pre_processed_datasets
-processor = preprocess(potential_files,7)
-print(processor.generate_data())
+
+## code below will only execute when ran from command line rather than imported
+if __name__ == "__main__":
+    processor = preprocess(potential_files,7)
+    data = processor.generate_data()
+    print(data)
+    
 
 
 
