@@ -181,7 +181,7 @@ class preprocess:
             prefix = np.arange(len(array)).reshape(-1, 1)
             array = np.hstack([prefix, array])
             
-            X = array[:, :-horizon]
+            X = array[:-horizon]
             X_shape = X.shape
             y = generate_y(array,horizon)
             y_shape = y.shape
