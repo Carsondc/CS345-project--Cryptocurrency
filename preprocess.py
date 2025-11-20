@@ -148,13 +148,11 @@ class preprocess:
                 file_path, #built in kaggle function creates a pandas data frame fromm kaggle data
             )
             array = df.to_numpy()
-            array = array[1:, 2:]
-            window = 10
-            sma_vals = sma(array, window).reshape(-1, 1)
-            array = array[window-1:, :]     
+            array = array[1:, 2:] #skip first row, remove sticker and time stamp
+            horizon
+            sma_vals = sma(array, horizon).reshape(-1, 1)
+            array = array[horizon-1:, :]     
             array = np.hstack([array, sma_vals]) #adding sma vlaues column
-            prefix = np.arange(len(array)).reshape(-1, 1) #creates an array that counts by by an integer each time. This is the number of since since start of data set
-            array = np.hstack([prefix, array]) #number of days since start of dataset replaces the time stamp
             golden_cross_values = golden_cross(array).reshape(-1,1) #golden cross was a 2d array, needs to be 1d
             death_cross_values = death_cross(array).reshape(-1,1) #death cross was a 2d array, needs to be 1d
             array = array[200:] #shift values from cross
@@ -162,14 +160,19 @@ class preprocess:
             array = np.hstack([array,death_cross_values]) #adding death cross values column
             prefix = np.arange(len(array)).reshape(-1, 1) #one id array of values that can be hstacked
             array = np.hstack([prefix, array]) #the prefix is the number of days since the start of the data set.
+            y = generate_y(array,horizon)
             X = array[:-horizon] #shortening X to match up with y
-            y = generate_y(X,horizon)
             X_y_tuple = (X,y) #This is a tuple of the 2d X array and thr 2d y array
             pre_processed_datasets.append(X_y_tuple) #This list containes tuples of each data set
         print("The columns are: (number of days since start,open,high,low,close,sma(10 days),golden cross, death cross)")
         return pre_processed_datasets # The result is a list of pre-processed X,y values for every dataset created by the user.
-processor = preprocess(potential_files,7) #Testing with all files, 7 days out
-print(processor.generate_data())
+processor = preprocess(potential_files[:3],7) #Testing with all files, 7 days out
+#debugging steps
+list_of_lists = processor.generate_data()
+X2 = list_of_lists[1][0] #access X array of second row
+Y2 = list_of_lists[1][1] #access y array of second row
+print(X2[205])
+print(Y2[198])
 
 
 
