@@ -42,7 +42,7 @@
       onkeyup="filterOptions()"
     />
 
-    <select id="dropdownMenu" size="6" multiple onchange="updateSelectedList()">
+    <select id="dropdownMenu" size="6" multiple onchange="updateSelectedList()" name="something">
     <option>1inch Network</option>
     <option>Aave</option>
     <option>Cardano</option>
@@ -147,7 +147,13 @@
     <input action = "/submit" method = "POST" type="number" placeholder="Enter a number" name = "days">
     <button type="submit">Send</button>
     </form>
+     <h2>Received Data</h2>
+  <p><strong>Cryptos:</strong> {{ cryptos }}</p>
+  <p><strong>Days:</strong> {{ days }}</p>
   </div>
+  
+
+  </textarea>
 
   <script>
     let selected_values = []
@@ -180,7 +186,6 @@ document.getElementById("dropdownMenu").addEventListener("click", function (even
     // Update textarea
     document.getElementById("selectedItems").value = selected_values.join(", ");
 });
-
   </script>
 
 </body>
