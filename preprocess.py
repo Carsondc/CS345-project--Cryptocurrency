@@ -2,6 +2,7 @@ import pandas as pd
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
 import numpy as np
+# list of all files the user can choose from. This will be chosen from the user front end
 potential_files = [
     "1INCH.csv",
     "AAVE.csv",
@@ -101,17 +102,12 @@ potential_files = [
     "ZEN.csv",
     "ZRX.csv",
 ]
-
-# print(len(potential_files))
-
-def time_stamp_to_days(array,time_stamp_index):
-    for i in range(array.shape[0]):
-        array[i][time_stamp_index] = i
 def sma(array, window):
     close = array[:, 3]                     
     kernel = np.ones(window) / window
     sma_vals = np.convolve(close, kernel, mode='valid')
     return sma_vals
+    #simple moving average, finance thing
 def golden_cross(array):
     sma50  = sma(array, 50)
     sma200 = sma(array, 200)
@@ -119,6 +115,7 @@ def golden_cross(array):
     above = sma50 > sma200
     crossed = (above[1:] & ~above[:-1])  
     return crossed.astype(int)
+#golden cross means price will increase
     
 def death_cross(array):
     sma50  = sma(array, 50)
@@ -129,81 +126,53 @@ def death_cross(array):
     return crossed.astype(int)
 def generate_y(array, horizon):
     close = array[:,4]
-    close_shape = close.shape
-    close_horizon = close[horizon:]
-    close_horizon_shape = close_horizon.shape
-    return close[horizon:]
-    # return close
+    return close[horizon:] # horizon is how many days in advance we are predicting
+#golden and death cross are finance concepts that can predict if sales will increase or decrease.
 class preprocess:
     def __init__(self,files,horizon):
             self.horizon = horizon
-            self.files = files   
-    def generate_data(self):
+            self.files = files
+    def __intit__(self): #default constructor
+        self.horizon = 7
+        self.files = potential_files[:5]
+    def generate_data(self): #constructor for generate data. Both values will be populated from user input.
         files = self.files
         horizon = self.horizon
-##### OLD START ###############################################################################################
-        # pre_processed_datasets = []
-##### OLD END ###############################################################################################
-##### NEW START ###############################################################################################
-        pre_processed_datasets = {}
-##### NEW END ###############################################################################################
+        pre_processed_datasets = [] #list containing all x,y tuples
         print("processing files")
-##### OLD START ###############################################################################################
-        # for file_path in files:
-##### OLD END ###############################################################################################
-        for index, file_path in enumerate(files):
-##### NEW START ###############################################################################################
+        for file_path in files:
             print(f"Loading {file_path}...")
-            
-            try:
-                df= kagglehub.dataset_load(
-                    KaggleDatasetAdapter.PANDAS,
-                    "svaningelgem/crypto-currencies-daily-prices",
-                    file_path,
-                )
-                print('its working')
-            except Exception as e:
-                print(f'failed to load {file_path} : {e}')
-            
+            df= kagglehub.dataset_load(
+                KaggleDatasetAdapter.PANDAS,
+                "svaningelgem/crypto-currencies-daily-prices",
+                file_path, #built in kaggle function creates a pandas data frame fromm kaggle data
+            )
             array = df.to_numpy()
-            array = array[1:, 2:]
-            window = 10
-            sma_vals = sma(array, window).reshape(-1, 1)
-            array = array[window-1:, :]     
-            array = np.hstack([array, sma_vals])
-            prefix = np.arange(len(array)).reshape(-1, 1)
-            array = np.hstack([prefix, array])
-            golden_cross_values = golden_cross(array).reshape(-1,1)
-            death_cross_values = death_cross(array).reshape(-1,1)
+            array = array[1:, 2:] #skip first row, remove sticker and time stamp
+            horizon
+            sma_vals = sma(array, horizon).reshape(-1, 1)
+            array = array[horizon-1:, :]     
+            array = np.hstack([array, sma_vals]) #adding sma vlaues column
+            golden_cross_values = golden_cross(array).reshape(-1,1) #golden cross was a 2d array, needs to be 1d
+            death_cross_values = death_cross(array).reshape(-1,1) #death cross was a 2d array, needs to be 1d
             array = array[200:] #shift values from cross
-            array = np.hstack([array,golden_cross_values])
-            array = np.hstack([array,death_cross_values])
-            prefix = np.arange(len(array)).reshape(-1, 1)
-            array = np.hstack([prefix, array])
-            
-            X = array[:-horizon]
-            X_shape = X.shape
+            array = np.hstack([array,golden_cross_values]) #adding golden cross values column
+            array = np.hstack([array,death_cross_values]) #adding death cross values column
+            prefix = np.arange(len(array)).reshape(-1, 1) #one id array of values that can be hstacked
+            array = np.hstack([prefix, array]) #the prefix is the number of days since the start of the data set.
             y = generate_y(array,horizon)
-            y_shape = y.shape
-##### OLD START ###############################################################################################
-            # X_y_tuple = (X,y)
-            # pre_processed_datasets.append(X_y_tuple)
-##### OLD END ###############################################################################################
-##### NEW START ###############################################################################################
-            ## using nested dictionaries so that we have O(1) average case time for look ups
-            xy_data_for_file_path = {'X' : X, 'y' : y}
-            pre_processed_datasets[file_path] = xy_data_for_file_path
-            
-##### NEW START ###############################################################################################
-        print("The features are:\nnumber of days since start | open | high | low | close | sma(10 days) | golden cross | death cross")
-        return pre_processed_datasets
-
-## code below will only execute when ran from command line rather than imported
-if __name__ == "__main__":
-    processor = preprocess(potential_files,7)
-    data = processor.generate_data()
-    print(data)
-    
+            X = array[:-horizon] #shortening X to match up with y
+            X_y_tuple = (X,y) #This is a tuple of the 2d X array and thr 2d y array
+            pre_processed_datasets.append(X_y_tuple) #This list containes tuples of each data set
+        print("The columns are: (number of days since start,open,high,low,close,sma(10 days),golden cross, death cross)")
+        return pre_processed_datasets # The result is a list of pre-processed X,y values for every dataset created by the user.
+processor = preprocess(potential_files[:3],7) #Testing with all files, 7 days out
+#debugging steps
+list_of_lists = processor.generate_data()
+X2 = list_of_lists[1][0] #access X array of second row
+Y2 = list_of_lists[1][1] #access y array of second row
+print(X2[205])
+print(Y2[198])
 
 
 
