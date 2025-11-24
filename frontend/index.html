@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Searchable Dropdown Form</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 16px;
+    }
+
+    select {
+      height: 150px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <form action="/submit" method="POST">
+    <h2>Please select the crypo currncies you want to predict</h2>
+
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="Search options..." 
+      onkeyup="filterOptions()"
+    />
+
+    <select id="dropdownMenu" size="6" multiple onchange="updateSelectedList()">
+    <option>1inch Network</option>
+    <option>Aave</option>
+    <option>Cardano</option>
+    <option>Algorand</option>
+    <option>Amp</option>
+    <option>ApeCoin</option>
+    <option>Arweave</option>
+    <option>Cosmos</option>
+    <option>Avalanche</option>
+    <option>Axie Infinity</option>
+    <option>Basic Attention Token</option>
+    <option>Bitcoin Cash</option>
+    <option>BNB</option>
+    <option>Bitcoin SV</option>
+    <option>Bitcoin</option>
+    <option>BitTorrent</option>
+    <option>PancakeSwap</option>
+    <option>Conflux Network</option>
+    <option>Chiliz</option>
+    <option>Compound</option>
+    <option>Cronos</option>
+    <option>Curve DAO Token</option>
+    <option>Convex Finance</option>
+    <option>Dai</option>
+    <option>Dash</option>
+    <option>Decred</option>
+    <option>DigiByte</option>
+    <option>Dogecoin</option>
+    <option>Polkadot</option>
+    <option>dYdX</option>
+    <option>MultiversX (formerly Elrond)</option>
+    <option>Ethereum Name Service</option>
+    <option>Ethereum Classic</option>
+    <option>Ethereum</option>
+    <option>Fetch.ai</option>
+    <option>Filecoin</option>
+    <option>Flow</option>
+    <option>FTX Token</option>
+    <option>Gala</option>
+    <option>Golem</option>
+    <option>The Graph</option>
+    <option>GateToken</option>
+    <option>Hedera</option>
+    <option>Helium</option>
+    <option>Internet Computer</option>
+    <option>Immutable X</option>
+    <option>Injective Protocol</option>
+    <option>IOTA</option>
+    <option>JUST</option>
+    <option>KuCoin Token</option>
+    <option>Kusama</option>
+    <option>Lido DAO</option>
+    <option>UNUS SED LEO</option>
+    <option>Chainlink</option>
+    <option>Livepeer</option>
+    <option>Litecoin</option>
+    <option>Decentraland</option>
+    <option>Mina Protocol</option>
+    <option>MEXC Token</option>
+    <option>NEAR Protocol</option>
+    <option>NEO</option>
+    <option>Nexo</option>
+    <option>APENFT</option>
+    <option>OKB</option>
+    <option>PAX Gold</option>
+    <option>Quant</option>
+    <option>Qtum</option>
+    <option>Raydium</option>
+    <option>Reserve Rights</option>
+    <option>THORChain</option>
+    <option>The Sandbox</option>
+    <option>Shiba Inu</option>
+    <option>Synthetix</option>
+    <option>Solana</option>
+    <option>Stacks</option>
+    <option>Sun Token</option>
+    <option>SuperVerse</option>
+    <option>PancakeSwap Syrup</option>
+    <option>Theta Network</option>
+    <option>Trust Wallet Token</option>
+    <option>Uniswap</option>
+    <option>USD Coin</option>
+    <option>USDD</option>
+    <option>Tether</option>
+    <option>VeChain</option>
+    <option>WEMIX</option>
+    <option>Tether Gold</option>
+    <option>Onyxcoin (formerly Chain)</option>
+    <option>eCash</option>
+    <option>Stellar</option>
+    <option>Monero</option>
+    <option>NANO / XNO</option>
+    <option>Ripple (XRP)</option>
+    <option>Tezos</option>
+    <option>Zcash</option>
+    <option>Horizen</option>
+    <option>0x Protocol</option>
+
+    </select>
+      <textarea id="selectedItems"  name = "selectedItems" placeholder="Selected items will appear here..." readonly></textarea>
+    <h2> Please enter the number of days you want to predict the currency</h2>
+    <input action = "/submit" method = "POST" type="number" placeholder="Enter a number" name = "days">
+    <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script>
+    let selected_values = []
+    function filterOptions() {
+      let input = document.getElementById("searchInput").value.toLowerCase();
+      let options = document.getElementById("dropdownMenu").options;
+
+      for (let i = 0; i < options.length; i++) {
+        let text = options[i].text.toLowerCase();
+        options[i].style.display = text.includes(input) ? "" : "none";
+      }
+    }
+    
+document.getElementById("dropdownMenu").addEventListener("click", function (event) {
+    if (event.target.tagName !== "OPTION") return;
+
+    let text = event.target.textContent;
+
+    // Toggle behavior
+    if (selected_values.includes(text)) {
+        // Remove
+        selected_values = selected_values.filter(item => item !== text);
+        event.target.selected = false; 
+    } else {
+        // Add
+        selected_values.push(text);
+        event.target.selected = true;
+    }
+
+    // Update textarea
+    document.getElementById("selectedItems").value = selected_values.join(", ");
+});
+
+  </script>
+
+</body>
+</html>
