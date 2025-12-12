@@ -20,6 +20,7 @@ class flaskserver:
         return render_template("index.html",
                             cryptos=selected,
                             days=days)
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
