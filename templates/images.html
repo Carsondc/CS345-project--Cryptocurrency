@@ -4,17 +4,26 @@
     <title>Regression Graphs</title>
 </head>
 <body>
+<style>
+#graphs {
+    overflow: visible;
+    margin: 20px;
+    align-items: center;
+}
+.img{
+    height: auto;
+    display: block;
+    margin-bottom: 30px;
+}
 
+</style>
 <h1>Generated Graphs</h1>
-
-<img src="{{ url_for('static', filename='plots/best_graph.png') }}" width="800">
-<br><br>
-<img src="{{ url_for('static', filename='plots/MAE_Bar_Chart.png') }}" width="800">
-<br><br>
-
-<img src="{{ url_for('static', filename='plots/RSME_Bar_Chart.png') }}" width="800">
-
-<br><br>
+<div id = "graphs">
+    <p>Graphs for the regression analysis are displayed below:</p>
+<img src="{{ url_for('static', filename='plots/best_graph.png') }}" width="800" class="img">
+<img src="{{ url_for('static', filename='plots/MAE_Bar_Chart.png') }}" width="800" class="img">
+<img src="{{ url_for('static', filename='plots/RSME_Bar_Chart.png') }}" width="800" class="img">
+</div>
 <a href="{{ url_for('home') }}">Back</a>
 
 </body>

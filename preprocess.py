@@ -2,6 +2,9 @@ import pandas as pd
 import kagglehub
 from kagglehub import KaggleDatasetAdapter
 import numpy as np
+import sklearn
+from sklearn.preprocessing import StandardScaler
+
 # list of all files the user can choose from. This will be chosen from the user front end
 potential_files = [
     "1INCH.csv",

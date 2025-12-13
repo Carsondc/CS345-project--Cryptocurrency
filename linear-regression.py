@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import StandardScaler
 import preprocess
 import sys
 
@@ -83,8 +84,8 @@ def predictionVals_Plot_DictOfErrors(prediction_points):
     for i in range(len(polynomial_degrees)):
         polynomial_features_train = PolynomialFeatures(degree=polynomial_degrees[i], include_bias=False)
         linear_regression_model_train = RidgeCV(alphas=alphas_to_test)
-        pipeline_on_training_data = Pipeline([("polynomial_features", polynomial_features_train), ("linear_regression", linear_regression_model_train)])                                                                                                                 
-        X_train2, X_test2, y_train2, y_test2 = train_test_split(X[:, feature_indecies], y, test_size=0.3, random_state=67, shuffle=True)
+        pipeline_on_training_data = Pipeline([("polynomial_features", polynomial_features_train), ("linear_regression", linear_regression_model_train), ("scaler", StandardScaler())])                                                                                                                 
+        X_train2, X_test2, y_train2, y_test2 = train_test_split(X[:, feature_indecies], y, test_size=0.3, random_state=67, shuffle=False)
         pipeline_on_training_data.fit(X_train2, y_train2)
         y_pred_train2 = pipeline_on_training_data.predict(X_train2)
         y_pred_test2 = pipeline_on_training_data.predict(X_test2)
@@ -135,13 +136,13 @@ def predictionVals_Plot_DictOfErrors(prediction_points):
         
         poly_features_best = PolynomialFeatures(degree=best_degree, include_bias=False)
         linear_reg_best = RidgeCV(alphas=alphas_to_test)
-        pipeline_best = Pipeline([("polynomial_features", poly_features_best), ("linear_regression", linear_reg_best)])
+        pipeline_best = Pipeline([("polynomial_features", poly_features_best), ("linear_regression", linear_reg_best), ("scaler", StandardScaler())])
         
-        X_train_best, X_test_best, y_train_best, y_test_best = train_test_split(X[:, feature_indecies], y, test_size=0.3, random_state=67, shuffle=True)
+        X_train_best, X_test_best, y_train_best, y_test_best = train_test_split(X[:, feature_indecies], y, test_size=0.3, random_state=67, shuffle=False)
         
         pipeline_best.fit(X_train_best, y_train_best)
     
-        plt.figure(figsize=(20,10))
+        plt.figure(figsize=(20,10), constrained_layout=True)
         
         ax = plt.subplot(1,1,1)
         ax.set_xlabel('x')
@@ -158,15 +159,15 @@ def predictionVals_Plot_DictOfErrors(prediction_points):
         y_max = max(np.max(y), np.max(LOBF_best), np.max(y_test_best), np.max(prediction_vals))
         ax.set_xlim(min_x, max_x)
         ax.set_ylim(y_min, y_max)
-        
-        ax.set_xlabel(f'days in the future')
+
+        ax.set_xlabel(f"best degree: {best_degree}\nbest MAE error on the test set: {best_row['test_MAE']}")
         ax.set_ylabel('value of the target')
         ax.legend()
         ax.set_title(currency_we_want_to_look_at)
         ax.grid() 
         
         best_fit_plot = plt.gcf()
-        fig_rmse, ax_rmse = plt.subplots(1, 1, figsize=(9, 4)) 
+        fig_rmse, ax_rmse = plt.subplots(1, 1, figsize=(9, 4), constrained_layout=True) 
         ax_rmse.bar(best_row['deg'], best_row['train_RMSE'], label='train_RMSE', alpha=1)
         ax_rmse.bar(best_row['deg'], best_row['test_RMSE'], label='test_RMSE', alpha=0.5)
         ax_rmse.bar(best_row['deg'], best_row['naiveMAE'], label='naiveMAE', alpha=0.25)
@@ -176,7 +177,7 @@ def predictionVals_Plot_DictOfErrors(prediction_points):
         ax_rmse.set_ylabel('RMSE value')
         ax_rmse.legend()
 
-        fig_mae, ax_mae = plt.subplots(1, 1, figsize=(9, 4)) 
+        fig_mae, ax_mae = plt.subplots(1, 1, figsize=(9, 4), constrained_layout=True) 
         ax_mae.bar(best_row['deg'], best_row['train_MAE'], label='train_MAE', alpha=1)
         ax_mae.bar(best_row['deg'], best_row['test_MAE'], label='test_MAE', alpha=0.5)
         ax_mae.bar(best_row['deg'], best_row['naiveMAE'], label='naiveMAE', alpha=0.25)
@@ -199,9 +200,13 @@ prediction_vals, train_and_test_errors_at_given_degree, best_graph, RMSE_bar_cha
 print(f"\nPredicted closing price in {HORIZON} days: {float(prediction_vals[0]):.6f}")
 with open("prediction.txt", "w") as f:
     f.write(f'{prediction_vals[0]:.6f}')
-best_graph.savefig("static/plots/best_graph.png")
-RMSE_bar_chart.savefig("static/plots/RSME_Bar_Chart")
-MAE_bar_chart.savefig("static/plots/MAE_Bar_Chart")
+best_graph.subplots_adjust(bottom=0.32)
+RMSE_bar_chart.subplots_adjust(bottom=0.32)
+MAE_bar_chart.subplots_adjust(bottom=0.32)
+
+best_graph.savefig("static/plots/best_graph.png", dpi=300)
+RMSE_bar_chart.savefig("static/plots/RSME_Bar_Chart.png", dpi=300)
+MAE_bar_chart.savefig("static/plots/MAE_Bar_Chart.png", dpi=300)
 
 
 
