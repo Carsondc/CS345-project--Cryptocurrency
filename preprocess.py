@@ -115,7 +115,7 @@ def golden_cross(array):
     above = sma50 > sma200
     crossed = (above[1:] & ~above[:-1])  
     return crossed.astype(int)
-#golden cross means price will increase
+#golden cross means price will increase chi ching!
     
 def death_cross(array):
     sma50  = sma(array, 50)
@@ -127,14 +127,11 @@ def death_cross(array):
 def generate_y(array, horizon):
     close = array[:,4]
     return close[horizon:] # horizon is how many days in advance we are predicting
-#golden and death cross are finance concepts that can predict if sales will increase or decrease.
+#golden and death cross are finance stuff that can predict if sales will increase or decrease.
 class preprocess:
     def __init__(self,files,horizon):
             self.horizon = horizon
             self.files = files
-    def __intit__(self): #default constructor
-        self.horizon = 7
-        self.files = potential_files[:5]
     def generate_data(self): #constructor for generate data. Both values will be populated from user input.
         files = self.files
         horizon = self.horizon
@@ -166,13 +163,13 @@ class preprocess:
             pre_processed_datasets.append(X_y_tuple) #This list containes tuples of each data set
         print("The columns are: (number of days since start,open,high,low,close,sma(10 days),golden cross, death cross)")
         return pre_processed_datasets # The result is a list of pre-processed X,y values for every dataset created by the user.
-processor = preprocess(potential_files[:3],7) #Testing with all files, 7 days out
-#debugging steps
-list_of_lists = processor.generate_data()
-X2 = list_of_lists[1][0] #access X array of second row
-Y2 = list_of_lists[1][1] #access y array of second row
-print(X2[205])
-print(Y2[198])
+if __name__ == "__main__":
+    processor = preprocess(potential_files[:3], 7)
+    list_of_lists = processor.generate_data()
+    X2 = list_of_lists[1][0]
+    Y2 = list_of_lists[1][1]
+    print(X2[205])
+    print(Y2[198])
 
 
 

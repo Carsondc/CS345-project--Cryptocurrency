@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Regression Graphs</title>
+</head>
+<body>
+
+<h1>Generated Graphs</h1>
+
+<img src="{{ url_for('static', filename='plots/best_graph.png') }}" width="800">
+<br><br>
+<img src="{{ url_for('static', filename='plots/MAE_Bar_Chart.png') }}" width="800">
+<br><br>
+
+<img src="{{ url_for('static', filename='plots/RSME_Bar_Chart.png') }}" width="800">
+
+<br><br>
+<a href="{{ url_for('home') }}">Back</a>
+
+</body>
+</html>
