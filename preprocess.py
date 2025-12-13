@@ -115,7 +115,7 @@ def golden_cross(array):
     above = sma50 > sma200
     crossed = (above[1:] & ~above[:-1])  
     return crossed.astype(int)
-#golden cross means price will increase
+#golden cross means price will increase chi ching!
     
 def death_cross(array):
     sma50  = sma(array, 50)
@@ -127,7 +127,7 @@ def death_cross(array):
 def generate_y(array, horizon):
     close = array[:,4]
     return close[horizon:] # horizon is how many days in advance we are predicting
-#golden and death cross are finance concepts that can predict if sales will increase or decrease.
+#golden and death cross are finance stuff that can predict if sales will increase or decrease.
 class preprocess:
     def __init__(self,files,horizon):
             self.horizon = horizon
