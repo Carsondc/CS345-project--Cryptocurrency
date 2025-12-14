@@ -193,7 +193,7 @@ def predictionVals_Plot_DictOfErrors(prediction_points):
         
     return prediction_vals, train_and_test_errors_at_given_degree, best_graph, RMSE_bar_chart, MAE_bar_chart
 
-pred_x_at_this_point = [13]
+pred_x_at_this_point = [HORIZON]
 
 prediction_vals, train_and_test_errors_at_given_degree, best_graph, RMSE_bar_chart, MAE_bar_chart =  predictionVals_Plot_DictOfErrors(pred_x_at_this_point)
 print(f"\nPredicted closing price in {HORIZON} days: {float(prediction_vals[0]):.6f}")
