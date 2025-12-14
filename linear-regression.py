@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import pandas as pd 
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import PolynomialFeatures
-from sklearn.preprocessing import StandardScaler
 import preprocess
 import sys
 
@@ -84,7 +83,7 @@ def predictionVals_Plot_DictOfErrors(prediction_points):
     for i in range(len(polynomial_degrees)):
         polynomial_features_train = PolynomialFeatures(degree=polynomial_degrees[i], include_bias=False)
         linear_regression_model_train = RidgeCV(alphas=alphas_to_test)
-        pipeline_on_training_data = Pipeline([("polynomial_features", polynomial_features_train), ("linear_regression", linear_regression_model_train), ("scaler", StandardScaler())])                                                                                                                 
+        pipeline_on_training_data = Pipeline([("polynomial_features", polynomial_features_train), ("linear_regression", linear_regression_model_train),])                                                                                                                 
         X_train2, X_test2, y_train2, y_test2 = train_test_split(X[:, feature_indecies], y, test_size=0.3, random_state=67, shuffle=False)
         pipeline_on_training_data.fit(X_train2, y_train2)
         y_pred_train2 = pipeline_on_training_data.predict(X_train2)
@@ -136,7 +135,7 @@ def predictionVals_Plot_DictOfErrors(prediction_points):
         
         poly_features_best = PolynomialFeatures(degree=best_degree, include_bias=False)
         linear_reg_best = RidgeCV(alphas=alphas_to_test)
-        pipeline_best = Pipeline([("polynomial_features", poly_features_best), ("linear_regression", linear_reg_best), ("scaler", StandardScaler())])
+        pipeline_best = Pipeline([("polynomial_features", poly_features_best), ("linear_regression", linear_reg_best)])
         
         X_train_best, X_test_best, y_train_best, y_test_best = train_test_split(X[:, feature_indecies], y, test_size=0.3, random_state=67, shuffle=False)
         
